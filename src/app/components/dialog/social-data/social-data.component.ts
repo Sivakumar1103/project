@@ -58,7 +58,10 @@ export class SocialDataComponent implements OnInit {
 
 
   ) { }
+  remove(){
+    this.show = false;
 
+  }
   visible(){
     this.show = true;
   }
@@ -103,10 +106,8 @@ export class SocialDataComponent implements OnInit {
     })
   }
   CommentReply(postInfo: any) {
-       
-
-    console.log('Posting Immediately:::::::',postInfo);
-
+    this.condition = false;
+    
     const twitterProfile: Array<any> = [];
     const fbProfile: Array<any> = [];
     const linkedInProfile: Array<any> = [];
@@ -141,7 +142,6 @@ export class SocialDataComponent implements OnInit {
       this.toastr.error("Text field is empty")
       return;
     } 
-    this.condition = false;
     const mediaArray = [];
     if (this.mediaData && this.mediaData.length > 0 && twitterProfile.length > 0) {
       mediaArray.push(this.contentlibraryService.uploadTwitterMedia({ fileNames: this.mediaData, twitterProfile }));
@@ -170,11 +170,11 @@ export class SocialDataComponent implements OnInit {
           })
         }
 
-        this.twitterService.postSocial(postData).subscribe(res => {
-          this.spinner.hide();
-          console.log(res)
-          this.toastr.success(res.status);
-        });
+        // this.twitterService.postSocial(postData).subscribe(res => {
+        //   this.spinner.hide();
+        //   console.log(res)
+        //   this.toastr.success(res.status);
+        // });
       });
     } else {
       this.twitterService.postSocial(postData).subscribe(res => {

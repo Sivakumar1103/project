@@ -31,7 +31,6 @@ export interface MediaData {
   styleUrls: ['./publishedpost.component.scss']
 })
 export class PublishedpostComponent implements OnInit {
-
   displayedColumns: string[] = ['postDate', 'postData', 'PublishedBy', 'Icon'];
   mediaDatasource!: MatTableDataSource<MediaData>;
 
