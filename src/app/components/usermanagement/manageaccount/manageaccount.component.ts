@@ -14,6 +14,7 @@ import { TwitterService } from 'src/app/services/socialmedia/twitter.service';
 import { ProfileService } from 'src/app/services/usermanagement/profile.service';
 import { PagesComponent } from '../../dialog/facebookPages/pages/pages.component';
 import { SocialMediaComponent } from '../../dialog/social-media/social-media.component';
+import { LinkedInPageComponent } from 'src/app/components/dialog/linked-in-page/linked-in-page.component';
 
 @Component({
   selector: 'app-manageaccount',
@@ -71,6 +72,15 @@ export class ManageaccountComponent implements OnInit {
         scMedia.fbpages?.forEach(fbpage => {
           this.dropdownList.push({ socialType: 'facebook', userId: scMedia.userId, pageId: fbpage.id, socialName: fbpage.name, socialImage: fbpage.userProfileImage });
         });
+      } else if (scMedia.name == 'linkedin') {
+        if (scMedia.linkedinProfile) {
+          this.dropdownList.push({ socialType: scMedia.name, userId: scMedia.userId, socialName: scMedia.linkedinProfile.userName, socialImage: scMedia.linkedinProfile.userImage });
+        }
+        if (scMedia.linkedinPages) {
+          scMedia.linkedinPages?.forEach(lnPage => {
+            this.dropdownList.push({ socialType: scMedia.name, pageId: lnPage.pageId || lnPage.userId, socialName: lnPage.pageName || lnPage.userName, socialImage: lnPage.pageImage || lnPage.userImage })
+          })
+        }
       } else {
         this.dropdownList.push({ socialType: scMedia.name, userId: scMedia.userId, socialName: scMedia.screenName, socialImage: scMedia.userProfileImage });
       }
@@ -112,7 +122,7 @@ export class ManageaccountComponent implements OnInit {
   }
 
   registerLinkedIn() {
-    this.linkedinService.getRedirectUrl().subscribe( res => {
+    this.linkedinService.getRedirectUrl().subscribe(res => {
       window.location.href = res.data;
     })
   }
@@ -141,7 +151,6 @@ export class ManageaccountComponent implements OnInit {
       }
     });
   }
-
   getFacebookAccountDetails(userId: String, accessToken: String) {
     this.fb.api(`${userId}/accounts?
           fields=name,access_token&

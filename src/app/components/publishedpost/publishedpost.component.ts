@@ -81,6 +81,8 @@ export class PublishedpostComponent implements OnInit {
 
 
   retrievePublishedData() {
+    this.spinner.show();
+
     this.twitterService.retrieveAllPublishedPost(false, true, false).subscribe(res => {
       //process Posts
       if (res.data && res.data.posts) {
@@ -99,6 +101,8 @@ export class PublishedpostComponent implements OnInit {
                 mediaUrl: tweet.mediaUrl,
               })
             }
+            this.spinner.hide();
+
           });
           postedPost.postData.linkedInData?.forEach((linkedIn: PostData) => {
             if (this.checkAccountLinked('linkedIn', linkedIn.userId)) {
@@ -154,7 +158,6 @@ export class PublishedpostComponent implements OnInit {
         this.mediaDatasource.sort = this.sort;
         this.mediaDatasource.paginator=this.paginator;
       });
-      this.spinner.hide();
     })
   }
 

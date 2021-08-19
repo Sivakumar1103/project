@@ -33,14 +33,14 @@ import { SocialProfileUtil } from 'src/app/utility/socialprofile';
 })
 
 export class DashboardComponent implements OnInit {
-  bitlyUrlEdit:boolean=true;
-  preBitlyUrl:any="";
-  showBtn:any="postNow";
+  bitlyUrlEdit: boolean = true;
+  preBitlyUrl: any = "";
+  showBtn: any = "postNow";
   showBtnMenu = false
   faSmileBeam = faSmileBeam;
   faDesktop = faDesktop;
   faImage = faImage;
-  selected_icon:any="";
+  selected_icon: any = "";
 
   public now: Date = new Date();
   scheduleTime = '';
@@ -145,7 +145,7 @@ export class DashboardComponent implements OnInit {
       this.spinner.show();
       this.linkedinService.retrieveLinkedProfile({ 'authCode': code }).subscribe(res => {
 
-        console.log("res.pro.............................file",res.profile)
+        console.log("res.pro.............................file", res.profile)
         this.spinner.hide();
         const modalRef = this.modalService.open(LinkedInPageComponent, { backdropClass: 'in', windowClass: 'in' });
         modalRef.componentInstance.messageData = {
@@ -176,7 +176,7 @@ export class DashboardComponent implements OnInit {
 
           })
         //this.router.navigate(['/'])
-     });
+      });
     }
 
     if (this.postId != '' && this.postStatus != '') {
@@ -406,9 +406,17 @@ export class DashboardComponent implements OnInit {
           this.dropdownList.push({ socialId: `facebook-${scMedia.userId}-${fbpage.id}`, socialName: `${fbpage.name}`, socialImage: fbpage.userProfileImage, pageId: fbpage.id });
         });
       } else if (scMedia.name == 'twitter') {
-        this.dropdownList.push({ socialId: `twitter-${scMedia.userId}`, socialName: `${scMedia.screenName}`, socialImage: scMedia.userProfileImage });
-      } else if (scMedia.name == 'linkedin') {
         this.dropdownList.push({ socialId: `linkedin-${scMedia.userId}`, socialName: `${scMedia.screenName}`, socialImage: scMedia.userProfileImage });
+      } else if (scMedia.name == 'linkedin') {
+        if (scMedia.linkedinProfile) {
+          this.dropdownList.push({ socialId: `linkedin-${scMedia.userId}`, socialName: `${scMedia.linkedinProfile.userName}`, socialImage: scMedia.linkedinProfile.userImage });
+        } if (scMedia.linkedinPages) {
+          scMedia.linkedinPages?.forEach(lnPage => {
+            this.dropdownList.push({ socialId: `linkedin-${scMedia.pageId}`||lnPage.userId, socialName: `${scMedia.pageName}`||lnPage.userName, socialImage: scMedia.userImage || lnPage.userImage});
+          })
+        } else {
+          this.dropdownList.push({ socialId: `linkedin-${scMedia.userId}`, socialName: `${scMedia.screenName}`, socialImage: scMedia.userProfileImage });
+        }
       }
     })
   }
@@ -514,7 +522,7 @@ export class DashboardComponent implements OnInit {
         if (socialProfile.socialId.includes('linkedin-')) {
           //id = socialProfile.socialId.split('linkedin-')[1]
           linkedInProfile.push({ name: 'linkedin', userId: socialProfile.socialId.split('linkedin-')[1] });
-        }else{
+        } else {
           linkedInProfile.push({ name: 'linkedin', userId: socialProfile.socialId.split('-')[1] });
         }
       }
@@ -552,21 +560,21 @@ export class DashboardComponent implements OnInit {
       forkJoin(mediaArray).subscribe((respData: any) => {
         let respArrCnt = 0;
         if (twitterProfile.length > 0) {
-          console.log(respData[respArrCnt]);         
-          
+          console.log(respData[respArrCnt]);
+
           twitterProfile.forEach(profile => {
-            console.log("respData[respArrCnt]...........",respData[respArrCnt]);
-            console.log("profile...........",profile);
-            profile['mediaUrl'] = respData[respArrCnt].mediaIdArr.flatMap((fileUrl: any) =>{
+            console.log("respData[respArrCnt]...........", respData[respArrCnt]);
+            console.log("profile...........", profile);
+            profile['mediaUrl'] = respData[respArrCnt].mediaIdArr.flatMap((fileUrl: any) => {
               if (fileUrl.userId == profile.userId) {
                 return fileUrl.mediaIds;
-              }else{
+              } else {
                 return [];
               }
             })
             //profile['mediaUrl'] = respData[respArrCnt].mediaId;
           })
-          console.log("twitterProfile",twitterProfile);
+          console.log("twitterProfile", twitterProfile);
           respArrCnt = respArrCnt + 1;
         }
 
@@ -577,8 +585,8 @@ export class DashboardComponent implements OnInit {
           })
         }
 
-        console.log("postData",postData);
-        
+        console.log("postData", postData);
+
 
         this.twitterService.postSocial(postData).subscribe(res => {
           this.spinner.hide();
@@ -611,7 +619,7 @@ export class DashboardComponent implements OnInit {
                 'progressStatus': 'Done',
                 'fileKey': selectedImage.Key,
                 //'fileUrl': `https://dhuhkrmpnuqm.cloudfront.net/${selectedImage.Key}`,
-                 'fileUrl': `https://aikyne-mediafiles.s3.ap-south-1.amazonaws.com/${selectedImage.Key}`,
+                'fileUrl': `https://aikyne-mediafiles.s3.ap-south-1.amazonaws.com/${selectedImage.Key}`,
               });
           })
         }
@@ -781,11 +789,11 @@ export class DashboardComponent implements OnInit {
       }
     }
   }
-  editBitlyUrl(url:any){
+  editBitlyUrl(url: any) {
     if (!this.bitlyUrlEdit) {
       this.postingData = this.postingData.replace(this.preBitlyUrl, url);
       this.bitlyUrlEdit = !this.bitlyUrlEdit;
-    }else{
+    } else {
       this.preBitlyUrl = url;
       this.bitlyUrlEdit = !this.bitlyUrlEdit;
     }

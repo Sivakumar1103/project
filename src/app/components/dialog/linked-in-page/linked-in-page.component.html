@@ -29,7 +29,7 @@
     </div>
   
     <div *ngIf="messageData && messageData.linkedinPages">
-      <h3 style="font-weight:500; padding-top: 2rem;">All Pages ({{messageData.linkedinPages.length}})  </h3> <br/>
+      <h3 style="font-weight:500; padding-top: 2rem;">All Pages ({{messageData.linkedinPages.orgName}})  </h3> <br/>
       <div *ngFor="let page of messageData.linkedinPages" class="col-xs-12 rowGap">
         <img style="width: 40px; height: 40px;" [src]="" class="socialImage"/> &nbsp;
         <span class="pageName">{{page.orgName}}</span>

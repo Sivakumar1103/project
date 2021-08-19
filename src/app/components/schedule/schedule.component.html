@@ -71,7 +71,7 @@
                 *ngIf="data.socialId.startsWith('linkedin')"></i>
               <i style="color: #4064ac;" class="fab fa-facebook fa-sm circle-icon iconPosition"
                 *ngIf="data.socialType == 'facebook'"> </i>
-              {{(data.socialName.length>15)? (data.socialName | slice:0:10) +'...':(data.socialName)}}
+              {{(data.socialName)? (data.socialName | slice:0:10) +'...':(data.socialName)}}
             </label>
             <hr>
           </div>
