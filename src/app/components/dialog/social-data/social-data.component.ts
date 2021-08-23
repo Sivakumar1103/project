@@ -58,10 +58,7 @@ export class SocialDataComponent implements OnInit {
 
 
   ) { }
-  remove(){
-    this.show = false;
 
-  }
   visible(){
     this.show = true;
   }
@@ -91,11 +88,11 @@ export class SocialDataComponent implements OnInit {
       if (socialMedia === 'twitter') {
         socialProfile = this.userSocialProfile?.socialMedia?.filter((profile: any) => (profile.userId == res.data.postInfo.userId && profile.name == socialMedia));
         console.log("socialProfile.....", socialProfile)
-      } else if (socialMedia === 'facebook') {
+      }/*  else if (socialMedia === 'facebook') {
         socialProfile = this.userSocialProfile?.socialMedia?.filter((profile: any) => (profile.userId == res.data.postInfo.userId && profile.name == socialMedia));
       } else if (socialMedia === 'linkedin') {
         socialProfile = this.userSocialProfile?.socialMedia?.filter((profile: any) => (profile.userId == res.data.postInfo.userId && profile.name == socialMedia));
-      }
+      } */
       this.postData =
       {
         socialData: res.data,
@@ -106,8 +103,10 @@ export class SocialDataComponent implements OnInit {
     })
   }
   CommentReply(postInfo: any) {
-    this.condition = false;
-    
+       
+
+    console.log('Posting Immediately:::::::',postInfo);
+
     const twitterProfile: Array<any> = [];
     const fbProfile: Array<any> = [];
     const linkedInProfile: Array<any> = [];
@@ -142,6 +141,7 @@ export class SocialDataComponent implements OnInit {
       this.toastr.error("Text field is empty")
       return;
     } 
+    this.condition = false;
     const mediaArray = [];
     if (this.mediaData && this.mediaData.length > 0 && twitterProfile.length > 0) {
       mediaArray.push(this.contentlibraryService.uploadTwitterMedia({ fileNames: this.mediaData, twitterProfile }));
@@ -170,11 +170,11 @@ export class SocialDataComponent implements OnInit {
           })
         }
 
-        // this.twitterService.postSocial(postData).subscribe(res => {
-        //   this.spinner.hide();
-        //   console.log(res)
-        //   this.toastr.success(res.status);
-        // });
+        this.twitterService.postSocial(postData).subscribe(res => {
+          this.spinner.hide();
+          console.log(res)
+          this.toastr.success(res.status);
+        });
       });
     } else {
       this.twitterService.postSocial(postData).subscribe(res => {

@@ -25,7 +25,7 @@ export class SocialProfileUtil {
         }
         if (scMedia.linkedinPages) {
           scMedia.linkedinPages?.forEach(lkPage => {
-           dropdownList.push({ socialType: 'linkedin', socialId: `${scMedia.name}#${scMedia.userId}-${lkPage.userId}`, userId: scMedia.userId, socialName: lkPage.userName, socialImage: lkPage.userImage, pageId: lkPage.userId});
+           dropdownList.push({ socialType: 'linkedin', socialId: `${scMedia.name}#${scMedia.userId}-${lkPage.pageId}`, userId: lkPage.pageId, socialName: lkPage.pageName, socialImage: lkPage.pageImage, pageId: lkPage.pageId});
           });
         }
       }

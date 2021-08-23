@@ -9,9 +9,6 @@ import { ManageaccountService } from 'src/app/services/manageaccount.service';
 import { AuthService } from 'src/app/services/usermanagement/auth.service';
 import { ProfileService } from 'src/app/services/usermanagement/profile.service';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import { TwitterService } from 'src/app/services/socialmedia/twitter.service';
-import { SocialDataComponent } from 'src/app/components/dialog/social-data/social-data.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
@@ -20,7 +17,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./personalinformation.component.scss']
 })
 export class PersonalinformationComponent implements OnInit {
-  userSocialProfile: SocialProfile | undefined;
 
   update: FormGroup;
   userData!: User;
@@ -43,9 +39,6 @@ export class PersonalinformationComponent implements OnInit {
     private spinner: NgxSpinnerService,
     private toastr: ToastrService,
     private route: ActivatedRoute,
-    private twitterService: TwitterService,
-    private modalService: NgbModal,
-
     private manageaccountService: ManageaccountService) {
     this.update = new FormGroup
       ({
@@ -116,6 +109,7 @@ export class PersonalinformationComponent implements OnInit {
 
   }
 
+
   editUser() {
     this.spinner.show();
     this.auth.updateUser(this.update.getRawValue())
@@ -152,31 +146,5 @@ export class PersonalinformationComponent implements OnInit {
       this.update.patchValue(res.data.account);
     })
   }
-
-
-  retreiveDetailedPost(socialName: string, pubPostId: string, userId: string ) {
-    this.spinner.show();
-    
-    this.twitterService.retreivePostFromWeb(socialName, pubPostId, userId).subscribe((res: any) => {
-      this.spinner.hide();
-      const modalRef = this.modalService.open(SocialDataComponent, { backdropClass: 'in', windowClass: 'in', size: 'lg', centered: true });
-      let socialProfile;
-      if (socialName === 'twitter') {
-        socialProfile = this.userSocialProfile?.socialMedia?.filter((profile: any) => (profile.userId == res.data.postInfo.userId && profile.name == socialName));
-      } else if (socialName === 'facebook') {
-        socialProfile = this.userSocialProfile?.socialMedia?.filter((profile: any) => (profile.userId == res.data.postInfo.userId && profile.name == socialName));
-      }else if (socialName === 'linkedin') {
-        socialProfile = this.userSocialProfile?.socialMedia?.filter((profile: any) => (profile.userId == res.data.postInfo.userId && profile.name == socialName));
-      }
-      modalRef.componentInstance.postData =
-      {
-        socialData: res.data,
-        profileData: socialProfile
-      }
-    })
-  }
-
-
-
 
 }

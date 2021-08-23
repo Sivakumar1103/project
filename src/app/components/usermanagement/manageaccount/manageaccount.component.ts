@@ -14,7 +14,6 @@ import { TwitterService } from 'src/app/services/socialmedia/twitter.service';
 import { ProfileService } from 'src/app/services/usermanagement/profile.service';
 import { PagesComponent } from '../../dialog/facebookPages/pages/pages.component';
 import { SocialMediaComponent } from '../../dialog/social-media/social-media.component';
-import { LinkedInPageComponent } from 'src/app/components/dialog/linked-in-page/linked-in-page.component';
 
 @Component({
   selector: 'app-manageaccount',
@@ -122,7 +121,7 @@ export class ManageaccountComponent implements OnInit {
   }
 
   registerLinkedIn() {
-    this.linkedinService.getRedirectUrl().subscribe(res => {
+    this.linkedinService.getRedirectUrl().subscribe( res => {
       window.location.href = res.data;
     })
   }
@@ -151,6 +150,7 @@ export class ManageaccountComponent implements OnInit {
       }
     });
   }
+
   getFacebookAccountDetails(userId: String, accessToken: String) {
     this.fb.api(`${userId}/accounts?
           fields=name,access_token&

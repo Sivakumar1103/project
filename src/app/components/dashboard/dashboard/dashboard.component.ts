@@ -406,20 +406,51 @@ export class DashboardComponent implements OnInit {
           this.dropdownList.push({ socialId: `facebook-${scMedia.userId}-${fbpage.id}`, socialName: `${fbpage.name}`, socialImage: fbpage.userProfileImage, pageId: fbpage.id });
         });
       } else if (scMedia.name == 'twitter') {
-        this.dropdownList.push({ socialId: `linkedin-${scMedia.userId}`, socialName: `${scMedia.screenName}`, socialImage: scMedia.userProfileImage });
-      } else if (scMedia.name == 'linkedin') {
+        this.dropdownList.push({ socialId: `twitter-${scMedia.userId}`, socialName: `${scMedia.screenName}`, socialImage: scMedia.userProfileImage });
+      }
+      // else if (scMedia.name == 'linkedin') {
+      // this.dropdownList.push({ socialId: `linkedin-${scMedia.userId}`, socialName: `${scMedia.screenName}`, socialImage: scMedia.userProfileImage });
+      else if (scMedia.name == 'linkedin') {
         if (scMedia.linkedinProfile) {
           this.dropdownList.push({ socialId: `linkedin-${scMedia.userId}`, socialName: `${scMedia.linkedinProfile.userName}`, socialImage: scMedia.linkedinProfile.userImage });
-        } if (scMedia.linkedinPages) {
-          scMedia.linkedinPages?.forEach(lnPage => {
-            this.dropdownList.push({ socialId: `linkedin-${scMedia.pageId}`||lnPage.userId, socialName: `${scMedia.pageName}`||lnPage.userName, socialImage: scMedia.userImage || lnPage.userImage});
-          })
-        } else {
-          this.dropdownList.push({ socialId: `linkedin-${scMedia.userId}`, socialName: `${scMedia.screenName}`, socialImage: scMedia.userProfileImage });
         }
+        if (scMedia.linkedinPages) {
+          scMedia.linkedinPages?.forEach(lnPage => {
+            this.dropdownList.push({ socialId: `linkedin-${scMedia.userId}-${lnPage.pageId}`, pageId: lnPage.pageId, socialName: lnPage.pageName, socialImage: `${lnPage.pageImage}` })
+
+            // this.dropdownList.push({ socialId: `linkedin-${scMedia.pageId}`, socialName: `${lnPage.pageName || lnPage.userName}`, socialImage: scMedia.lnPage.pageImage || lnPage.userImage })
+          })
+        }
+        console.log("this.dropdownList",this.dropdownList);
+        
+      } else {
+        this.dropdownList.push({ socialType: scMedia.name, userId: scMedia.userId, socialName: scMedia.screenName, socialImage: scMedia.userProfileImage });
       }
     })
   }
+
+  // processSocialDropdowns() {
+  //   this.dropdownList = [];
+  //   this.userSocialProfile?.socialMedia?.forEach(scMedia => {
+  //     if (scMedia.name == 'facebook') {
+  //       scMedia.fbpages?.forEach(fbpage => {
+  //         this.dropdownList.push({ socialType: 'facebook', userId: scMedia.userId, pageId: fbpage.id, socialName: fbpage.name, socialImage: fbpage.userProfileImage });
+  //       });
+  //     } else if (scMedia.name == 'linkedin') {
+  //       if (scMedia.linkedinProfile) {
+  //         this.dropdownList.push({ socialType: scMedia.name, userId: scMedia.userId, socialName: scMedia.linkedinProfile.userName, socialImage: scMedia.linkedinProfile.userImage });
+  //       }
+  //       if (scMedia.linkedinPages) {
+  //         scMedia.linkedinPages?.forEach(lnPage => {
+  //           this.dropdownList.push({ socialType: scMedia.name, pageId: lnPage.pageId || lnPage.userId, socialImage: lnPage.pageImage || lnPage.userImage })
+  //         })
+  //       }
+  //     } else {
+  //       this.dropdownList.push({ socialType: scMedia.name, userId: scMedia.userId, socialName: scMedia.screenName, socialImage: scMedia.userProfileImage });
+  //     }
+  //   })
+  //   this.spinner.hide();
+  // }
 
   get getItems() {
     return this.dropdownList.reduce((acc: any, curr: any) => {
@@ -513,18 +544,23 @@ export class DashboardComponent implements OnInit {
 
 
     this.selectedSocailProfile.forEach(socialProfile => {
+      console.log("socialProfile",socialProfile);
+      
       this.spinner.show();
       if (socialProfile.socialId?.startsWith('facebook')) {
         fbProfile.push({ name: 'facebook', userId: socialProfile.socialId.split('-')[1], pageId: socialProfile.socialId.split('-')[2] });
       } else if (socialProfile.socialId?.startsWith('twitter')) {
         twitterProfile.push({ name: 'twitter', userId: socialProfile.socialId.split('-')[1] });
       } else if (socialProfile.socialId?.startsWith('linkedin')) {
+        
+        console.log("socialProfile.socialId", socialProfile.socialId);
         if (socialProfile.socialId.includes('linkedin-')) {
           //id = socialProfile.socialId.split('linkedin-')[1]
-          linkedInProfile.push({ name: 'linkedin', userId: socialProfile.socialId.split('linkedin-')[1] });
-        } else {
+          linkedInProfile.push({ name: 'linkedin', userId: socialProfile.socialId.split('linkedin-')[1], pageId: socialProfile.socialId.split('-')[2] });
+        }/*  else {
           linkedInProfile.push({ name: 'linkedin', userId: socialProfile.socialId.split('-')[1] });
-        }
+          //linkedInProfile.push({ name: 'linkedin', pageId: socialProfile.socialId.split('-')[1] });
+        } */
       }
     })
 
@@ -545,6 +581,10 @@ export class DashboardComponent implements OnInit {
       this.toastr.error("Select at least one social media profile")
       return;
     }
+
+
+
+    return;
 
     const mediaArray = [];
     if (this.mediaData && this.mediaData.length > 0 && twitterProfile.length > 0) {
@@ -598,6 +638,7 @@ export class DashboardComponent implements OnInit {
 
       });
     } else {
+      console.log("postData jgvfygvgv......", postData);
       this.twitterService.postSocial(postData).subscribe(res => {
         this.spinner.hide();
         console.log(res)

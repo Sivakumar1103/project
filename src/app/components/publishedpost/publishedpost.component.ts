@@ -31,6 +31,7 @@ export interface MediaData {
   styleUrls: ['./publishedpost.component.scss']
 })
 export class PublishedpostComponent implements OnInit {
+
   displayedColumns: string[] = ['postDate', 'postData', 'PublishedBy', 'Icon'];
   mediaDatasource!: MatTableDataSource<MediaData>;
 
@@ -81,8 +82,6 @@ export class PublishedpostComponent implements OnInit {
 
 
   retrievePublishedData() {
-    this.spinner.show();
-
     this.twitterService.retrieveAllPublishedPost(false, true, false).subscribe(res => {
       //process Posts
       if (res.data && res.data.posts) {
@@ -101,11 +100,12 @@ export class PublishedpostComponent implements OnInit {
                 mediaUrl: tweet.mediaUrl,
               })
             }
-            this.spinner.hide();
-
           });
           postedPost.postData.linkedInData?.forEach((linkedIn: PostData) => {
+            console.log("test ..................");
             if (this.checkAccountLinked('linkedIn', linkedIn.userId)) {
+              console.log("test in the if");
+              
               this.publishedPost.push({
                 userName: linkedIn.userName,
                 userId: linkedIn.userId,
@@ -134,7 +134,9 @@ export class PublishedpostComponent implements OnInit {
               })
             }
           });
+          
         });
+        console.log("this.publishedPost",this.publishedPost);
       }
       this.mediaDatasource = new MatTableDataSource(this.publishedPost);
 
@@ -158,6 +160,7 @@ export class PublishedpostComponent implements OnInit {
         this.mediaDatasource.sort = this.sort;
         this.mediaDatasource.paginator=this.paginator;
       });
+      this.spinner.hide();
     })
   }
 
@@ -230,6 +233,8 @@ export class PublishedpostComponent implements OnInit {
 
   checkAccountLinked(socialType: string, userId = '') {
     if (socialType !== 'facebook') {
+      console.log("this.dropdownList",this.dropdownList);
+      console.log("userId",userId);
       const filterProf = this.dropdownList.filter((prof: any) => prof.userId == userId);
       if (filterProf && filterProf.length > 0) {
         return true;
@@ -285,6 +290,7 @@ export class PublishedpostComponent implements OnInit {
       } else if (socialName === 'facebook') {
         socialProfile = this.userSocialProfile?.socialMedia?.filter((profile: any) => (profile.userId == res.data.postInfo.userId && profile.name == socialName));
       }else if (socialName === 'linkedin') {
+        
         socialProfile = this.userSocialProfile?.socialMedia?.filter((profile: any) => (profile.userId == res.data.postInfo.userId && profile.name == socialName));
       }
       modalRef.componentInstance.postData =

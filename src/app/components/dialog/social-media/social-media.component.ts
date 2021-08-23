@@ -55,7 +55,7 @@ export class SocialMediaComponent implements OnInit {
 
       if (response.status === 'connected') {
         this.facebookAKService.generateAcessToken({ shortToken: response.authResponse.accessToken, userId: response.authResponse.userID }).subscribe(res => {
-          console.log('FB account registered')
+          console.log('FB account registered',response.authResponse.userID,response.authResponse.accessToken)
           this.getFacebookAccountDetails(response.authResponse.userID, response.authResponse.accessToken);
         });
       }
@@ -63,7 +63,7 @@ export class SocialMediaComponent implements OnInit {
         this.fb.login({ scope: 'public_profile,email, pages_show_list,pages_manage_ads,pages_manage_cta,pages_manage_engagement,pages_manage_posts,pages_read_engagement,pages_read_user_content,publish_to_groups' })
           .then((response: LoginResponse) => {
             this.facebookAKService.generateAcessToken({ shortToken: response.authResponse.accessToken, userId: response.authResponse.userID }).subscribe(res => {
-              console.log('FB account registered');
+              console.log('FB account registered.....',response.authResponse.userID,response.authResponse.accessToken);
               this.getFacebookAccountDetails(response.authResponse.userID, response.authResponse.accessToken);
             });
           })
