@@ -1,107 +1,69 @@
-import { isPlatformBrowser } from '@angular/common';
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { SocialAuthService } from 'angularx-social-login';
-import { AuthService } from './services/usermanagement/auth.service';
-import { ProfileService } from './services/usermanagement/profile.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { User } from 'src/app/model/user';
-import { SocialDropDown, SocialProfile } from 'src/app/model/socialProfile';
-import { TwitterService } from 'src/app/services/socialmedia/twitter.service';
-import { FacebookService, InitParams } from 'ngx-facebook-fb';
-import { IDropdownSettings } from 'ng-multiselect-dropdown';
-import { ManageaccountService } from './services/manageaccount.service';
-
-
+import {
+  Component,
+  ChangeDetectionStrategy,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
+import { TranslationService } from './modules/i18n/translation.service';
+// language list
+import { locale as enLang } from './modules/i18n/vocabs/en';
+import { locale as chLang } from './modules/i18n/vocabs/ch';
+import { locale as esLang } from './modules/i18n/vocabs/es';
+import { locale as jpLang } from './modules/i18n/vocabs/jp';
+import { locale as deLang } from './modules/i18n/vocabs/de';
+import { locale as frLang } from './modules/i18n/vocabs/fr';
+import { SplashScreenService } from './_metronic/partials/layout/splash-screen/splash-screen.service';
+import { Router, NavigationEnd, NavigationError } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { TableExtendedService } from './_metronic/shared/crud-table';
 @Component({
-  selector: 'app-root',
+  // tslint:disable-next-line:component-selector
+  selector: 'body[root]',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit {
-  userSocialProfile: SocialProfile | undefined;
-  isTwitterAvailable = false;
-  isFacebookAvailable = false;
-  tweetData = '';
-
-  title = 'Aikyne Social Media Publisher';
-  userData!: User;
-  userId = '';
-  public dropdownList: SocialDropDown[] = [];
-
-
-  dropdownSettings: IDropdownSettings = {
-    singleSelection: false,
-    idField: 'socialId',
-    textField: 'socialName',
-    enableCheckAll: false,
-    itemsShowLimit: 5,
-    allowSearchFilter: false,
-  };
+export class AppComponent implements OnInit, OnDestroy {
+  private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
 
   constructor(
+    private translationService: TranslationService,
+    private splashScreenService: SplashScreenService,
     private router: Router,
-    public authServiceAK: AuthService,
-    public profileService: ProfileService,
-    private twitterService: TwitterService,
-    private manageaccountService: ManageaccountService,
-    private fb: FacebookService,
-    @Inject(PLATFORM_ID) private platformId: Object) { }
-
-
-  ngOnInit(): void {
-    // uncomment for prod deployment
-    setTimeout(() => {
-      this.facebookInit();
-    }, 500);
-    if (this.router.url.indexOf('socialManage/twitterSignUp') != -1) {
-      const urlParams = new URLSearchParams(this.router.url);
-      const retToken = urlParams.get('retToken');
-      const oauth_token = urlParams.get('oauth_token');
-      const oauth_verifier = urlParams.get('oauth_verifier');
-      this.twitterService.generateAcessToken({ 'retToken': retToken, 'oauth_token': oauth_token, 'oauth_verifier': oauth_verifier }).subscribe(res => {
-        this.router.navigate(['/'])
-      });
-    }
-    if (!this.profileService.userData.firstName) {
-      this.profileService.retrieveUserProfile().subscribe(res => {
-        this.profileService.userData = res.data;
-        this.retrieveSocialMediProfile();
-      });
-    } else {
-      this.retrieveSocialMediProfile();
-    }
+    private tableService: TableExtendedService
+  ) {
+    // register translations
+    this.translationService.loadTranslations(
+      enLang,
+      chLang,
+      esLang,
+      jpLang,
+      deLang,
+      frLang
+    );
   }
 
-  isAuthenticated() {
-    return this.authServiceAK.loggedIn();
-  }
+  ngOnInit() {
+    const routerSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        // clear filtration paginations and others
+        this.tableService.setDefaults();
+        // hide splash screen
+        this.splashScreenService.hide();
 
-  facebookInit() {
-    console.log('FB Init called')
-    if (isPlatformBrowser(this.platformId)) {
-      let initParams: InitParams = {
-        appId: '173379087570136',
-        xfbml: true,
-        version: 'v2.8'
-      };
-      this.fb.init(initParams).then(res => { console.log('FB init completed') });
-    }
-  }
+        // scroll to top on every route change
+        window.scrollTo(0, 0);
 
-  retrieveSocialMediProfile() {
-    this.manageaccountService.retrieveSocialMediaProfile().subscribe(res => {
-      this.userSocialProfile = res.data as SocialProfile;
-      this.manageaccountService.userSocialProfile = res.data as SocialProfile;
-      this.dropdownList = [];
-      this.userSocialProfile?.socialMedia?.forEach(scMedia => {
-        if (scMedia.name == 'facebook') {
-          scMedia.fbpages?.forEach(fbpage => {
-            this.dropdownList.push({ socialId: `facebook-${scMedia.userId}-${fbpage.id}`, socialName: fbpage.name });
-          });
-        } else if (scMedia.name == 'twitter') {
-          this.dropdownList.push({ socialId: `twitter-${scMedia.userId}`, socialName: scMedia.screenName });
-        }
-      })
+        // to display back the body content
+        setTimeout(() => {
+          document.body.classList.add('page-loaded');
+        }, 500);
+      }
     });
+    this.unsubscribe.push(routerSubscription);
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe.forEach((sb) => sb.unsubscribe());
   }
 }
